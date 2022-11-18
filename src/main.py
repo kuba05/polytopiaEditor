@@ -1,15 +1,22 @@
 import pygame, sys
 
 from screens import screenmanager
+from settingsmanager import SettingsManager
+
 
 pygame.init()
 RESOLUTION = (600, 400)
 FPS = 30
+SETTINGS_FILE = "settings.conf"
+
+
 
 fpsClock = pygame.time.Clock()
 display = pygame.display.set_mode(RESOLUTION, pygame.RESIZABLE)
 
-screen = screenmanager.ScreenManager(display)
+settingsManager = SettingsManager()
+settingsManager.loadSettings(SETTINGS_FILE)
+screenManager = screenmanager.ScreenManager(display, settingsManager)
 
 #loop
 running = True
@@ -19,13 +26,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         else:
-            screen.handle(event) 
- #   screenManager.update(events)
-    screen.draw()
+            screenManager.handle(event)
+            
+    screenManager.draw()
     pygame.display.update()
     fpsClock.tick(FPS)
 
-screen.quit()
+settingsManager.saveSettings(SETTINGS_FILE)
+screenManager.quit()
 pygame.quit()
 sys.exit()
 

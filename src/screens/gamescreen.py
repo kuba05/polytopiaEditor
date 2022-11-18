@@ -5,48 +5,45 @@ from . import Screen
 from components import tile, constants
 
 class GameScreen(Screen):
-
     def setup(self):
-        defaults = {
+        print("setup")
+        defaultsOne = {
                 "side": 15,
+                "tileLongerDiagonalLength": 150
+        }
+        
+        self.fixEnviroment(defaultsOne)
+
+        defaultsTwo = {
                 "cameraOffset":  [
                     0,
-                    self.getEnviroment("side")/4 * self.getEnviroment("tileLongerDiagonalLength")
+                    self.settings["side"]/4 * self.settings["tileLongerDiagonalLength"]
                 ],
                 "mode": constants.modes.CHANGETILES,
-                "changeto": constants.tiles.FOREST
+                "changeto": constants.tiles.FOREST,
                 "gameplan": [
                     [
                         tile.Tile(
                             self.display,
                             i,
                             j,
-                            (i+j)%4
-                        ) for i in range(enviroment["side"])
-                    ] for j in range(enviroment["side"])
+                            constants.tiles.FOREST
+                        ) for i in range(self.settings["side"])
+                    ] for j in range(self.settings["side"])
                 ]
         }
-
-        self.fixEnviroment(defaults)
-
         
+        self.settings.log()
+        self.fixEnviroment(defaultsTwo)
 
     def draw(self):
-        """
-        Draw on screen
-        """
-        gameplan = self.getEnviroment("gameplan")
+        gameplan = self.settings["gameplan"]
 
         for row in gameplan:
             for tile in row:
-                tile.draw()
-
-
+                tile.draw(self.settings["tileLongerDiagonalLength"], self.settings["cameraOffset"])
 
     def handle(self, event):
-        """
-        Handle events.
-        """
         # wrong event type
         if (
             event.type != pygame.MOUSEBUTTONDOWN and
@@ -56,9 +53,9 @@ class GameScreen(Screen):
         
         # load relevant enviroment
         pos = pygame.mouse.get_pos()
-        cameraOffset = self.getEnviroment("cameraOffset")
-        longerDiagonalLength = self.getEnviroment("tileLongerDiagonalLength")
-        gameplan = self.getEnviroment("gameplan")
+        cameraOffset = self.settings["cameraOffset"]
+        tileLongerDiagonalLength = self.settings["tileLongerDiagonalLength"]
+        gameplan = self.settings["gameplan"]
 
 
         XCor = pos[0] - cameraOffset[0]
@@ -72,4 +69,4 @@ class GameScreen(Screen):
             return False
 
         # position is inside, so handle the click
-        return gameplan[x][y].handle(event)
+        return gameplan[x][y].changeState(self.settings["changeto"])
