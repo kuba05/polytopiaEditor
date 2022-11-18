@@ -1,6 +1,7 @@
 import sys
 
 import pygame
+import pygame.locals
 from . import Screen
 from components import tile, constants
 
@@ -9,15 +10,16 @@ class GameScreen(Screen):
         print("setup")
         defaultsOne = {
                 "side": 15,
-                "tileLongerDiagonalLength": 150
+                "tileDiagonalLength": 150,
+                "scrollingSpeed": 10
         }
         
         self.fixEnviroment(defaultsOne)
 
         defaultsTwo = {
                 "cameraOffset":  [
-                    0,
-                    self.settings["side"]/4 * self.settings["tileLongerDiagonalLength"]
+                    100,
+                    self.settings["side"]/4 * self.settings["tileDiagonalLength"]
                 ],
                 "mode": constants.modes.CHANGETILES,
                 "changeto": constants.tiles.FOREST,
@@ -41,28 +43,80 @@ class GameScreen(Screen):
 
         for row in gameplan:
             for tile in row:
-                tile.draw(self.settings["tileLongerDiagonalLength"], self.settings["cameraOffset"])
+                tile.draw(self.settings["tileDiagonalLength"], self.settings["cameraOffset"])
 
     def handle(self, event):
         # wrong event type
         if (
-            event.type != pygame.MOUSEBUTTONDOWN and
-            (event.type != pygame.MOUSEMOTION or not pygame.mouse.get_pressed()[0])
+            event.type == pygame.MOUSEBUTTONDOWN or
+            (event.type == pygame.MOUSEMOTION and pygame.mouse.get_pressed()[0])
         ):
-            return False
+            self.handleClick(event)
+            return True
+
+        if (event.type == pygame.KEYDOWN):
+            self.handleScrolling(
+                    event.key == pygame.locals.K_UP,
+                    event.key == pygame.locals.K_DOWN,
+                    event.key == pygame.locals.K_LEFT,
+                    event.key == pygame.locals.K_RIGHT
+            )
+            return True
+
+
+       
+    def handleScrolling(self, up, down, left, right):
+        if up: 
+            self.settings["cameraOffset"][1] += self.settings["scrollingSpeed"]
+        if down:
+            self.settings["cameraOffset"][1] -= self.settings["scrollingSpeed"]
+        if left:
+            self.settings["cameraOffset"][0] += self.settings["scrollingSpeed"]
+        if right:
+            self.settings["cameraOffset"][0] -= self.settings["scrollingSpeed"]
+
+
+        displaySize = self.display.get_size()
+
+        tolerance = 2 * self.settings["tileDiagonalLength"]
+
+        maxScrollUp = self.settings["side"]/2 * self.settings["tileDiagonalLength"]/2
+
+        maxScrollDown = -(self.settings["side"]/2 * self.settings["tileDiagonalLength"]/2 - displaySize[1])
+
+        maxScrollLeft = 0
+
+        maxScrollRight = -(self.settings["side"] * self.settings["tileDiagonalLength"] - displaySize[0])
+
+        if self.settings["cameraOffset"][1] > maxScrollUp + tolerance:
+            self.settings["cameraOffset"][1] = maxScrollUp + tolerance
+
+        if self.settings["cameraOffset"][1] < maxScrollDown - tolerance: 
+            self.settings["cameraOffset"][1] = maxScrollDown - tolerance
+
+        if self.settings["cameraOffset"][0] > maxScrollLeft + tolerance:
+            self.settings["cameraOffset"][0] = maxScrollLeft + tolerance
         
+        if self.settings["cameraOffset"][0] < maxScrollRight - tolerance:
+            self.settings["cameraOffset"][0] = maxScrollRight - tolerance
+
+        print("offset")
+        print(self.settings["cameraOffset"])
+
+
+    def handleClick(self, event):
         # load relevant enviroment
         pos = pygame.mouse.get_pos()
         cameraOffset = self.settings["cameraOffset"]
-        tileLongerDiagonalLength = self.settings["tileLongerDiagonalLength"]
+        tileDiagonalLength = self.settings["tileDiagonalLength"]
         gameplan = self.settings["gameplan"]
 
 
         XCor = pos[0] - cameraOffset[0]
         YCor = pos[1] - cameraOffset[1]
 
-        x = int((XCor + 2*YCor) // tileLongerDiagonalLength)
-        y = int((XCor - 2*YCor) // tileLongerDiagonalLength)
+        x = int((XCor + 2*YCor) // tileDiagonalLength)
+        y = int((XCor - 2*YCor) // tileDiagonalLength)
 
         # position is outside
         if x < 0 or x >= len(gameplan) or y < 0 or y >= len(gameplan[0]):

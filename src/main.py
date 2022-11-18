@@ -18,6 +18,7 @@ settingsManager = SettingsManager()
 settingsManager.loadSettings(SETTINGS_FILE)
 screenManager = screenmanager.ScreenManager(display, settingsManager)
 
+pygame.key.set_repeat(50)
 #loop
 running = True
 while running:
@@ -27,7 +28,8 @@ while running:
             running = False
         else:
             screenManager.handle(event)
-            
+    
+    display.fill((0,0,0))
     screenManager.draw()
     pygame.display.update()
     fpsClock.tick(FPS)

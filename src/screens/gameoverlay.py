@@ -46,20 +46,6 @@ class GameOverlay(Screen):
         
     def draw(self):
         displaySize = self.display.get_size()
-        """
-        pygame.draw.rect(
-                self.display,
-                (50,50,50),
-                (
-                    (
-                        0,
-                        displaySize[1] - self.settings["gameOverlaySize"]
-                    ),
-                    (
-                        displaySize[0], displaySize[1]
-                    )
-                )
-        )"""
 
         for i, button in enumerate(self.buttons.keys()):
             self.display.blit(
