@@ -17,7 +17,7 @@ class Tile:
 
 
     def __adjustColor(self):
-        self.originalSurface = constants.tilesSurfaces[self.state].convert_alpha()
+        self.originalSurface = constants.tilesImages[self.state].convert_alpha()
         self.rotatedSurface = None
 
 

@@ -50,8 +50,6 @@ class Screen(metaclass=abc.ABCMeta):
 
         Checks for each 'name', that it exists in enviroment and if not, it creates it setting its value to 'value'
         """
-        print("fixing enviroment")
-        print(defaults)
         for key, value in defaults.items():
             if key not in self.settings:
                 self.settings[key] = value

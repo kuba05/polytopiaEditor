@@ -7,7 +7,6 @@ from components import tile, constants
 
 class GameScreen(Screen):
     def setup(self):
-        print("setup")
         defaultsOne = {
                 "side": 15,
                 "tileDiagonalLength": 150,
@@ -21,8 +20,8 @@ class GameScreen(Screen):
                     100,
                     self.settings["side"]/4 * self.settings["tileDiagonalLength"]
                 ],
-                "mode": constants.modes.CHANGETILES,
-                "changeto": constants.tiles.FOREST,
+                "mode": constants.modes.SELECT,
+                "onTileClick": lambda tile: False,
                 "gameplan": [
                     [
                         tile.Tile(
@@ -100,8 +99,6 @@ class GameScreen(Screen):
         if self.settings["cameraOffset"][0] < maxScrollRight - tolerance:
             self.settings["cameraOffset"][0] = maxScrollRight - tolerance
 
-        print("offset")
-        print(self.settings["cameraOffset"])
 
 
     def handleClick(self, event):
@@ -123,4 +120,4 @@ class GameScreen(Screen):
             return False
 
         # position is inside, so handle the click
-        return gameplan[x][y].changeState(self.settings["changeto"])
+        return self.settings["onTileClick"](gameplan[x][y])

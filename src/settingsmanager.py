@@ -15,7 +15,7 @@ class SettingsManager:
         return X in self.__settings or X in self.__options
     
     def __getitem__(self, item):
-             return self.get(item)
+        return self.get(item)
 
     def __setitem__(self, item, value):
         self.set(item, value)
@@ -27,7 +27,6 @@ class SettingsManager:
         print("options", self.__options)
         
     def get(self, name):
-#        print("getting", name)
         self.log()
         if name in self.__settings:
             return self.__settings[name]
@@ -39,7 +38,6 @@ class SettingsManager:
         self.__settings[name] = value
 
     def set(self, name, value):
-        print("setting", name, value)
         self.__options[name] = value
 
     def saveSettings(self, fileName):
@@ -50,5 +48,7 @@ class SettingsManager:
         try:
             with open(fileName, "rb") as inputFile:
                 self.__settings = pickle.load(inputFile)
+            print("settings loaded")
+            print(self.__settings)
         except FileNotFoundError:
             self.__settings = {}
