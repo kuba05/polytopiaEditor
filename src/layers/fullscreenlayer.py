@@ -1,15 +1,19 @@
 import abc
 import pygame
-from settingsmanager import SettingsManager
+from .layer import Layer
+from components import SettingsManager
 
-class Screen(metaclass=abc.ABCMeta):
-    def __init__(self, display: pygame.Surface, settingsManager: SettingsManager):
-        self.display = display
+class FullscreenLayer(Layer):
+    def __init__(self, surfaceSize: tuple[int], settingsManager: SettingsManager):
+        """
+        FullscreenLayer uses, unlike WindowedLayer, the whole surface it was given.
+        """
+        self.surfaceSize = surfaceSize
         self.settings = settingsManager
         self.setup()
 
     @abc.abstractmethod
-    def handle(self, event: pygame.event) -> bool:
+    def handle(self, event: pygame.event, mousePosition: tuple[int]) -> bool:
         """
         Handle event call.
         Returns True if the event was consumed, False otherwise.
@@ -17,9 +21,9 @@ class Screen(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def draw(self) -> None:
+    def draw(self, surfaceSize: tuple[int]) -> pygame.Surface:
         """
-        Draws this screen of the pygame screen.
+        Draws this layer on given pygame surface.
         """
         pass
 
@@ -28,11 +32,14 @@ class Screen(metaclass=abc.ABCMeta):
         """
         This method is called upon construction of the object.
 
-        Both getEnviroment and adjustEnviroment are available.
+        Both self.settings and self.setupSettings are available.
 
         For setting default values of enviroment, please use fixEnviroment.
         """
         pass
+
+    def changeSurface(self, newSurface: pygame.Surface) -> None:
+        self.surface = newSurface
 
     def quit(self) -> None:
         """
@@ -40,7 +47,7 @@ class Screen(metaclass=abc.ABCMeta):
         """
         pass
 
-    def fixEnviroment(self, defaults: dict[str, any]) -> None:
+    def setupSettings(self, defaults: dict[str, any]) -> None:
         """
         defaults = {
             name1: value1,

@@ -1,9 +1,12 @@
 import pickle
+import sys
 
 class SettingsManager:
+    #FIXME: uses only settings
     def __init__(self, initialSettings = {}, initialOptions = {}):
         """
         Manage settings and options.
+
 
         Both settings and options are dictionaries. Settings are immutable and take precedence over options, which are mutable, i.e. if requested key is in both settings and options, the one in settings will be returned.
         """
@@ -21,34 +24,38 @@ class SettingsManager:
         self.set(item, value)
 
     def log(self):
+        print(self.__settings)
         return
-        print("log")
-        print("settings", self.__settings)
-        print("options", self.__options)
         
     def get(self, name):
-        self.log()
         if name in self.__settings:
             return self.__settings[name]
-        if name in self.__options:
-            return self.__options[name]
         raise KeyError(f"{name}")
 
-    def changeSettings(self, name, value):
-        self.__settings[name] = value
+
 
     def set(self, name, value):
-        self.__options[name] = value
+        self.__settings[name] = value
+
+
 
     def saveSettings(self, fileName):
+        return False
         with open(fileName, "wb+") as outputFile:
             pickle.dump(self.__settings, outputFile)
+        print("settings saved into file", file = sys.stderr)
+
+
 
     def loadSettings(self, fileName):
         try:
             with open(fileName, "rb") as inputFile:
                 self.__settings = pickle.load(inputFile)
-            print("settings loaded")
-            print(self.__settings)
+            print("settings loaded from file:", file = sys.stderr)
+            print(self.__settings, file = sys.stderr)
         except FileNotFoundError:
+            print("file not found while loading settings", file = sys.stderr)
+            self.__settings = {}
+        except EOFError:
+            print("error reading file", file = sys.stderr)
             self.__settings = {}

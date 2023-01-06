@@ -19,7 +19,14 @@ class Namespace:
     def __len__(self):
         return len(self.__dict__)
 
-tiles = Namespace(
+
+
+pygame.font.init()
+font = pygame.font.SysFont('Comic Sans MS', 30)
+
+
+
+terrains = Namespace(
         FOREST = "forest",
         WATER = "water",
         OCEAN = "ocean",
@@ -27,42 +34,45 @@ tiles = Namespace(
         MOUNTAINS = "moutains"
 )
 
-modes = Namespace(
-        SELECT = "Select",
-        CHANGETILES = "Change tiles"
+
+__modes = Namespace(
+    SELECTMODE = "Select Mode",
+    CHANGETERRAIN = "Change tiles",
+    BANANA = "banana"
 )
 
-pygame.font.init()
-font = pygame.font.SysFont('Comic Sans MS', 30)
-
-modesImages = Namespace(**{
-    modes.SELECT: font.render("SELECT", True, (0,0,0)),
-        modes.CHANGETILES: font.render("TILES", True, (0,0,0))
-        })
+gameoverlay = Namespace(
+    modes = __modes,
+    modesImages = Namespace(**{
+        __modes.SELECTMODE: font.render("SELECT", True, (255,255,255)),
+        __modes.CHANGETERRAIN: font.render("TILES", True, (255,255,255)),
+        __modes.BANANA: font.render("BANANA", True, (255,255,255))
+    })
+)
 
 """
 fillings is a helper dict, where all one should specify either an surface or color for each tile
 """
 fillings = {
-        tiles.FOREST: (34, 139, 34),
-        tiles.WATER: (156, 211, 219),
-        tiles.OCEAN: (43, 101, 236),
-        tiles.PLAINS: (82, 161, 123),
-        tiles.MOUNTAINS: (85, 65, 36)
+        terrains.FOREST: (34, 139, 34),
+        terrains.WATER: (156, 211, 219),
+        terrains.OCEAN: (43, 101, 236),
+        terrains.PLAINS: (82, 161, 123),
+        terrains.MOUNTAINS: (85, 65, 36)
 }
 
 """
 Note that surfaces can be in any size to prevent lossy compresion
 """
-tilesImages = Namespace()
+terrainImages = Namespace()
 
 for tile in fillings:
     if type(fillings[tile]) == pygame.Surface:
-        tilesImages[tile] = fillings[tile]
+        terrainImages[tile] = fillings[tile]
         continue
 
     surface = pygame.Surface((100,100))
     surface.fill(fillings[tile])
-    tilesImages[tile] = surface
+    terrainImages[tile] = surface
 
 del(fillings)
