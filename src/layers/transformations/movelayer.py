@@ -2,33 +2,35 @@ from collections.abc import Callable
 
 import pygame
 
-from .layer import Layer
-from .fullscreenlayer import FullscreenLayer
+from ..layer import Layer, LayerBuilder
 from components import SettingsManager
 
-class WindowedLayer(Layer):
+class MoveLayer(Layer):
     def __init__(
             self,
-            layer: FullscreenLayer,
-            getWindowPosition: Callable[[SettingsManager], pygame.Rect],
-            baseSurfaceSize,
-            settingsManager: SettingsManager
+            surfaceSize: tuple[int],
+            settingsManager: SettingsManager,
+            layerBuilder: LayerBuilder,
+            getWindowPosition: Callable[[tuple[int], SettingsManager], pygame.Rect]
     ):
-        self.baseSurfaceSize = baseSurfaceSize
-        self.getPosition = getWindowPosition
-        self.currentPosition = pygame.Rect((0,0), (0,0))
+        self.surfaceSize = surfaceSize
         self.settings = settingsManager
-        self.layer = layer(
+
+        self.getPosition = getWindowPosition
+        self.currentPosition = pygame.Rect(
+                (0, 0, 0, 0)
+        )
+        
+        self.layer = layerBuilder.build(
                 (self.currentPosition.w, self.currentPosition.h),
                 self.settings
         )
-
         self.recalculatePosition()
 
 
 
     def recalculatePosition(self):
-        newPosition = pygame.Rect(self.getPosition(self.settings))
+        newPosition = pygame.Rect(self.getPosition(self.surfaceSize, self.settings))
         if newPosition == self.currentPosition:
             return
         self.currentPosition = newPosition
@@ -59,13 +61,13 @@ class WindowedLayer(Layer):
 
 
 
-    def draw(self, outputSurfaceSize: tuple[int]) -> pygame.Surface:
+    def _draw(self, surfaceSize: tuple[int]) -> pygame.Surface:
         """
         Draws this layer in given pygame Surface
         """
-        self.baseSurfaceSize = outputSurfaceSize
+        self.surfaceSize = surfaceSize
         self.recalculatePosition()
-        surface = pygame.Surface(self.baseSurfaceSize, pygame.SRCALPHA)
+        surface = pygame.Surface(self.surfaceSize, pygame.SRCALPHA)
         surface.fill((0,0,0,0))
         surface.blit(
                 self.layer.draw(

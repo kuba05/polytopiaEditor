@@ -3,10 +3,10 @@ import sys, math
 import pygame
 import pygame.locals
 
-from .fullscreenlayer import FullscreenLayer
+from .contentlayer import ContentLayer
 from components import DrawTile, constants, tilehelper
 
-class TerrainLayer(FullscreenLayer):
+class TerrainLayer(ContentLayer):
     def setup(self):
         defaults = {
                 "side": 15,
@@ -24,23 +24,19 @@ class TerrainLayer(FullscreenLayer):
         ]
 
 
-    def draw(self, surfaceSize):
+    def _draw(self, surfaceSize):
         self.surfaceSize = surfaceSize
         
-        tileLength = math.floor(min(
-                self.surfaceSize[0]/self.settings["side"],
-                #in this projection, the y axis is scaled down by the factor of 2
-                self.surfaceSize[1]/self.settings["side"]*2
-        ) / 4) * 4
-
+        tileLength = tilehelper.getTileLength(self.surfaceSize, self.settings["side"])
 
         outputSurface = pygame.Surface(self.surfaceSize)
-        outputSurface.fill((255,255,255))
+        outputSurface.fill((0, 0, 0, 255))
+
         for x, row in reversed(list(enumerate(self.gameplan))):
             for y, tile in enumerate(row):
                 coordinates = tilehelper.getPositionOfTile(x, y, tileLength, self.settings["side"])
                 outputSurface.blit(
-                        tile.draw(tileLength, x, y),
+                        tile.draw(tileLength + 1, x, y),
                         (coordinates[0], coordinates[1] - tileLength/4)
                 )
         return outputSurface
@@ -58,11 +54,7 @@ class TerrainLayer(FullscreenLayer):
     
 
     def handleClick(self, event, mousePosition):
-        tileLength = min(
-                self.surfaceSize[0]/self.settings["side"],
-                #in this projection, the y axis is scaled down by the factor of 2
-                self.surfaceSize[1]/self.settings["side"]*2 
-        )
+        tileLength = tilehelper.getTileLength(self.surfaceSize, self.settings["side"])
 
         x, y = tilehelper.getTileFromCoordinates(mousePosition[0], mousePosition[1], tileLength, self.settings["side"])
 

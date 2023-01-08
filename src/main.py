@@ -1,8 +1,7 @@
 import pygame, sys
 
-from screenmanager import ScreenManager
 from components import SettingsManager
-
+from setuplayers import SetupLayers
 
 RESOLUTION = (600, 400)
 FPS = 30
@@ -12,7 +11,7 @@ SETTINGS_FILE = "settings.conf"
 
 def exit():
     settingsManager.saveSettings(SETTINGS_FILE)
-    screenManager.quit()
+    rootLayer.quit()
     pygame.quit()
 
 
@@ -23,7 +22,7 @@ display = pygame.display.set_mode(RESOLUTION, pygame.RESIZABLE)
 
 settingsManager = SettingsManager()
 settingsManager.loadSettings(SETTINGS_FILE)
-screenManager = ScreenManager(display.get_size(), settingsManager)
+rootLayer = SetupLayers(display.get_size(), settingsManager).getRoot()
 
 #loop
 running = True
@@ -36,10 +35,10 @@ try:
             if event.type == pygame.QUIT:
                 running = False
             else:
-                screenManager.handle(event, pygame.mouse.get_pos())
+                rootLayer.handle(event, pygame.mouse.get_pos())
         
         display.fill((0,0,0))
-        display.blit(screenManager.draw(display.get_size()), (0,0))
+        display.blit(rootLayer.draw(display.get_size()), (0,0))
         pygame.display.update()
         fpsClock.tick(FPS)
 except Exception as e:

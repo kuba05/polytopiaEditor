@@ -1,5 +1,15 @@
 import math
 
+def getTileLength(surfaceSize, sideLength):
+    """
+    returns tile length given the size of display surface and the number of tiles per side
+    """
+    return math.floor(min(
+            surfaceSize[0] / sideLength,
+            #in this projection, the y axis is scaled down by the factor of 2
+            surfaceSize[1] / sideLength * 2
+    ) / 4) * 4
+
 def getPositionOfTile(x, y, tileLength, sideLength):
     """
     returns coordinates of tile's left-most point, provided the map is fit so that tile (0,0) touches the line x=0 and tile (0,sideLength) touches the line y=0

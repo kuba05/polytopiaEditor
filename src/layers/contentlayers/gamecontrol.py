@@ -1,12 +1,12 @@
 import pygame
-from .fullscreenlayer import FullscreenLayer
+from .contentlayer import ContentLayer
 from components import constants, Button, Function
 
 
-class GameOverlay(FullscreenLayer):
+class GameControl(ContentLayer):
     def setup(self):
         defaults = {
-                "gameOverlayHeight": 100,
+                "gameControlHeight": 100,
                 "changeTerrainTo": lambda originalTerrain: originalTerrain,
         }
        
@@ -95,7 +95,7 @@ class GameOverlay(FullscreenLayer):
 
 
         
-    def draw(self, surfaceSize):
+    def _draw(self, surfaceSize):
         self.surfaceSize = surfaceSize
 
         display = pygame.Surface(surfaceSize)

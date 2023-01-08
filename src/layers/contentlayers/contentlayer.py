@@ -1,13 +1,25 @@
+import sys
 import abc
+
 import pygame
-from .layer import Layer
+
+from ..layer import Layer
 from components import SettingsManager
 
-class FullscreenLayer(Layer):
-    def __init__(self, surfaceSize: tuple[int], settingsManager: SettingsManager):
+class ContentLayer(Layer):
+    def __init__(
+        self,
+        surfaceSize: tuple[int],
+        settingsManager: SettingsManager,
+        *params: any
+    ):
         """
-        FullscreenLayer uses, unlike WindowedLayer, the whole surface it was given.
+        ContentLayer provides some helper methods.
         """
+        if len(params) > 0:
+            print(f"Layer {self.__class__.__name__} recieved unexpected parameters:", sys.stderr)
+            print(params, sys.stderr)
+
         self.surfaceSize = surfaceSize
         self.settings = settingsManager
         self.setup()
@@ -20,12 +32,6 @@ class FullscreenLayer(Layer):
         """
         pass
 
-    @abc.abstractmethod
-    def draw(self, surfaceSize: tuple[int]) -> pygame.Surface:
-        """
-        Draws this layer on given pygame surface.
-        """
-        pass
 
     @abc.abstractmethod
     def setup(self) -> None:
